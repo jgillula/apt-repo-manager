@@ -1,4 +1,5 @@
 #!/bin/bash
+# VERSION 1.0.0
 
 CONFIG_FILE=${APT_REPO_MANAGER_CONF:-/etc/apt-repo-manager.conf}
 if [ ! -f "$CONFIG_FILE" ]; then
