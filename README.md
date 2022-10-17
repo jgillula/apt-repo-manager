@@ -86,3 +86,34 @@ where `$YOUR_MACHINES_URL` is the network url of your server (e.g. `my_apt_repo.
 ### Don't forget to `apt update` after setting up the client!
 
 ## How It Works
+
+Debian/Ubuntu repos are customarily organized on servers in a directory of the form `some_directory/dists/DISTRO`, and inside each distro-specific folder are a couple of files like `Release`, `InRelease`, `Packages.gz`, etc. For more details, [see the Debian wiki](https://wiki.debian.org/DebianRepository/Format). Some of these files must be signed using gpg (e.g. `InRelease` is the signed version of `Release`). The scripts in `apt-repo-manager` handle all this for you, so you just have to drop a bunch of deb files in a `some_directory/dists/DISTRO` directory, point the scripts at that directory, and run them.
+
+Here's what each file does, specifically:
+
+### `apt-repo-manager.conf`
+
+This file defines two environment variables:
+* `REPO_NAME` is a descriptive name of your repo, mostly used to identify what gpg key to use for signing
+* `PACKAGE_ARCHIVE_DIR` is the directory which hosts your repo.
+> Note that you **do not** put your `.deb` files directly in this directory! Instead they go in `PACKAGE_ARCHIVE_DIR/dists/DISTRO`
+
+By default, the scripts below attempt to find `apt-repo-manager.conf` at `/etc/apt-repo-manager.conf`. If you want to use a different config file, set the environment variable `APT_REPO_MANAGER_CONF` to the location of your `apt-repo-manager.conf` file.
+
+### `update-local-apt-repos.sh`
+
+This script does the heavy lifting. It cycles through each distro directory in `PACKAGE_ARCHIVE_DIR/dists/`, using tools like `dpkg-scanpackages` to create all the metadata files your repo needs in each corresponding distro directory. (It's designed this way so you can easily host repos for multiple distros on the same server.) It also signs the necessary metadata files using the gpg key identified by `REPO_NAME`.
+
+### `get-repo-signing-key.sh`
+In order to access your repo remotely, it needs to be signed with a gpg key. This script either creates that key (if you pass `--create`), or saves the public key to a file. It identifies which key to use by `REPO_NAME`.
+
+You'll usually only need to run this once.
+
+### `rsync-local-apt-archives.sh`
+Simply populates your repository from the local apt cache in `/var/cache/apt/archives`. (It automatically detects which distro you're on.)
+
+### `apt-repo-manager-cron`
+A simple cron job to run everything on a schedule.
+
+## Questions? Comments?
+Feel free to open an issue or a PR.
