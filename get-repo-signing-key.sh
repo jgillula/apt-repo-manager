@@ -37,7 +37,7 @@ while [ "$1" != "" ]; do
 done
 
 if [[ "$CREATE_KEY" == true ]]; then
-    gpg --batch --passphrase '' --quick-gen-key "${REPO_NAME}"
+    gpg --batch --quick-gen-key "${REPO_NAME}"
 fi
 
 gpg --export -a "${REPO_NAME}" > "${PUBLIC_KEY_FILENAME}"
