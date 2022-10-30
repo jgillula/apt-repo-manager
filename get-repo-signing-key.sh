@@ -40,6 +40,6 @@ if [[ "$CREATE_KEY" == true ]]; then
     gpg --batch --quick-gen-key "${REPO_NAME}"
 fi
 
-gpg --export -a "${REPO_NAME}" > "${PUBLIC_KEY_FILENAME}"
+gpg --export "${REPO_NAME}" > "${PUBLIC_KEY_FILENAME}"
 echo "Public key saved in \"${PUBLIC_KEY_FILENAME}\""
 echo "Copy it to /etc/apt/trusted.gpg.d/ on your client"
